@@ -8,12 +8,13 @@ class Food
 public:
     Food(const Location& loc_in);
     void Respawn(Location& loc_in,bool isSuper);
-    void Draw(Board& brd_in, int time) const;
+    void Draw(Board& brd_in, float time) const;
     Location GetLocation()const;
     bool IsSuper();
 private:
     Location loc;
-    int pulseMax = 2;
+    float pulseMax = 2.5f;
+    float pulseSpeed = 8.0f;
     bool super=false;
     static constexpr Color normalColor = Colors::Red;
     static constexpr Color superColor = { 153, 51, 255 };

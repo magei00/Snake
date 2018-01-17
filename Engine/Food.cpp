@@ -11,9 +11,9 @@ void Food::Respawn(Location & loc_in, bool isSuper)
     super = isSuper;
 }
 
-void Food::Draw(Board & brd_in, int time) const
+void Food::Draw(Board & brd_in, float time) const
 {
-    int padding = cos(time)*pulseMax+pulseMax;
+    int padding = int (cos(time*pulseSpeed)*pulseMax+pulseMax);
     if (super)
     {
         brd_in.DrawCellAdvanced(loc, superColor, padding);

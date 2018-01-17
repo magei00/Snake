@@ -20,6 +20,7 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include <chrono>
 
 Game::Game( MainWindow& wnd )
 	:
@@ -51,6 +52,8 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+    const float dt = ft.Mark();
+
     if (!mainThemePlaying)
     {
         mainTheme.Play();
@@ -76,8 +79,8 @@ void Game::UpdateModel()
             delta_loc = { 1,0 };
         }
 
-        snakeMoveCounter++;
-        if (snakeMoveCounter >= snakeMovePeriod) {
+        snakeMoveCounter+= dt;
+        if (snakeMoveCounter >= snakeSpeed) {
 
             Location next = snake.GetLocationOfHead();
             next.Add(delta_loc);
@@ -128,7 +131,7 @@ void Game::UpdateModel()
             {
                 snake.MoveBy(delta_loc);
                 currentDir = delta_loc;
-                snakeMoveCounter = 0;
+                snakeMoveCounter = 0.0f;
             }
 
             
@@ -136,7 +139,7 @@ void Game::UpdateModel()
 
         }
 
-        rockSpawnCounter++;
+        rockSpawnCounter+=dt;
         if (rockSpawnCounter >= rockSpawnInterval) //spawns rocks in time intervals
         {
 
@@ -152,21 +155,20 @@ void Game::UpdateModel()
             rockSpawnCounter = 0;
         }
 
-        if (time % snakeSpeedIncreaseInterval == 0) // increases snake speed over time
+        
+        if (snakeSpeed <= snakeMoveMinPeriod) //increase speed of snake over time
         {
-            if (snakeMovePeriod <= snakeMoveMinPeriod)
-            {
-                snakeMovePeriod = snakeMoveMinPeriod;
-            }
-            else
-            {
-                snakeMovePeriod--;
-            }
-            
+            snakeSpeed = snakeMoveMinPeriod;
         }
+        else
+        {
+            snakeSpeed = baseSnakeSpeed - 0.005f*(time/snakeSpeedIncreaseInterval);
+        }
+            
+        
     }
     
-    time++;
+    time+=dt;
 }
 
 bool Game::checkCollisionWithRocks(Location loc)
@@ -185,19 +187,10 @@ bool Game::checkCollisionWithRocks(Location loc)
 
 void Game::ComposeFrame()
 {
-    /*std::uniform_int_distribution<int> colorDist(0, 255);
-    for (int i = 0; i < brd.GetWidth(); i++)
-    {
-        for (int j = 0; j < brd.GetHeight(); j++)
-        {
-            Location loc = { i,j };
-            Color c(colorDist(rng), colorDist(rng), colorDist(rng));
-            brd.DrawCell(loc, c);
-        }
-    }*/
+    
     brd.DrawBorder();
     snake.Draw(brd);
-    food.Draw(brd, time/10);
+    food.Draw(brd, time);
 
     for (int i = 0; i < nRocks; i++)
     {

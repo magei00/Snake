@@ -32,6 +32,7 @@
 #include "Rock.h"
 #include "Sound.h"
 #include "SoundEffect.h"
+#include "FrameTimer.h"
 
 class Game
 {
@@ -53,7 +54,8 @@ private:
 	MainWindow& wnd;
 	Graphics gfx;
 	/********************************/
-	/*  User Variables              */
+	/*  User Variables    */
+    FrameTimer ft;
     std::mt19937_64 rng;
     Board brd;
     Snake snake;
@@ -62,17 +64,17 @@ private:
     std::uniform_int_distribution<int> superFoodPercentage;
     Food food;
     Location currentDir = { 1,0 };
-    double fps = 120;
-    int snakeMovePeriod = 10 * (fps / 120);
-    int snakeMoveMinPeriod = snakeMovePeriod / 2;
-    int snakeMoveCounter = 0;
+    float baseSnakeSpeed = 0.1f;
+    float snakeSpeed = baseSnakeSpeed;
+    float snakeMoveMinPeriod = baseSnakeSpeed / 2.0f;
+    float snakeMoveCounter = 0.0f;
     int gameOver = false;
-    int time = 1;
+    float time = 0.0001;
     Rock rocks[100];
     int nRocks = 0;
-    int rockSpawnInterval = 400* (fps/120);
-    int rockSpawnCounter = 0;
-    int snakeSpeedIncreaseInterval = 2400 * (fps / 120);
+    float rockSpawnInterval = 5.0f;
+    float rockSpawnCounter = 00.f;
+    float snakeSpeedIncreaseInterval = 15.0f;
     Sound mainTheme;
     Sound gameOverSound;
     SoundEffect bite;
