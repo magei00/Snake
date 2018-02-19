@@ -28,7 +28,6 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd ),
     brd(gfx),
     rng(std::random_device()()),
-    snake({5,5}),
     food({ 10,10 }),
     superFoodPercentage(1, 7),
     mainTheme(L"mainTheme.wav", 0.0f,182.0f ),
@@ -96,6 +95,11 @@ void Game::UpdateModel()
                     snake.Grow();
                     snake.Grow();
 
+                    for (Rock& r : rocks) {
+                        r.makeVulnerable(true);
+                    }
+                    powerUpCounter = 0.0f;
+
                     superBite.Play(rng);
                 }
                 else
@@ -118,13 +122,14 @@ void Game::UpdateModel()
             }
 
             
-
+            //check for gameoverconditions
             if (!brd.IsInsideBoard(next)||
                 snake.IsPartOfSnakeExceptTail(next)||
                 checkCollisionWithRocks(next))
             {
                 gameOver = true;
                 mainTheme.StopAll();
+                
                 gameOverSound.Play();
             }
             else
@@ -164,8 +169,24 @@ void Game::UpdateModel()
         {
             snakeSpeed = baseSnakeSpeed - 0.005f*(time/snakeSpeedIncreaseInterval);
         }
-            
         
+        //Keeps track of powerup time
+        if (powerUpCounter <= powerUpDuration) {
+            powerUpCounter += dt;
+        }
+        else if (powerUpCounter > powerUpDuration)
+        {
+            for (Rock& r : rocks) {
+                r.makeVulnerable(false);
+            }
+        }
+        
+    }else 
+    {
+        if (wnd.kbd.KeyIsPressed(VK_ESCAPE))
+        {
+            Reset();
+        }
     }
     
     time+=dt;
@@ -178,11 +199,37 @@ bool Game::checkCollisionWithRocks(Location loc)
     {
         if (loc == rocks[i].GetLocation())
         {
-            return true;
+            if (rocks[i].IsVulnerable()) //if the rock is vulnerable eat it otherwise gameover
+            {
+                snake.Grow();
+                bite.Play(rng);
+
+                rocks[i].Delete();
+            }
+            else 
+            {
+                return true;
+            }
+            
         }
     }
 
     return false;
+}
+
+void Game::Reset()
+{
+    snake.Reset();
+    gameOver = false;
+    snakeSpeed = baseSnakeSpeed;
+    snakeMoveCounter = 0.0f;
+    powerUpCounter = 0.0f;
+    delta_loc = { 1,0 };
+    //Rock rocks[100];
+    nRocks = 0;
+    rockSpawnCounter = 0.0f;
+    mainThemePlaying = false;
+    gameOverSound.StopAll();
 }
 
 void Game::ComposeFrame()
@@ -194,11 +241,19 @@ void Game::ComposeFrame()
 
     for (int i = 0; i < nRocks; i++)
     {
-        rocks[i].Draw(brd);
+        if (powerUpDuration - powerUpCounter <= 3.0f) //blink if powerup is about to expire
+        {
+            rocks[i].Draw(brd, true, time);
+        }
+        else
+        {
+            rocks[i].Draw(brd, false, time);
+        }
+        
     }
 
     if (gameOver)
     {
-        spr.DrawGameOver(350, 250, gfx);
+        spr.DrawGameOver(240, 250, gfx);
     }
 }

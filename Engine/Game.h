@@ -48,6 +48,7 @@ private:
 	/*  User Functions              */
 
     bool checkCollisionWithRocks(Location loc);
+    void Reset();
 
 	/********************************/
 private:
@@ -68,12 +69,14 @@ private:
     float snakeSpeed = baseSnakeSpeed;
     float snakeMoveMinPeriod = baseSnakeSpeed / 2.0f;
     float snakeMoveCounter = 0.0f;
+    float powerUpCounter = 0.0f;
+    float powerUpDuration = 10.0f;
     int gameOver = false;
     float time = 0.0001;
-    Rock rocks[100];
+    Rock rocks[200];
     int nRocks = 0;
-    float rockSpawnInterval = 5.0f;
-    float rockSpawnCounter = 00.f;
+    float rockSpawnInterval = 3.0f;
+    float rockSpawnCounter = 0.0f;
     float snakeSpeedIncreaseInterval = 15.0f;
     Sound mainTheme;
     Sound gameOverSound;

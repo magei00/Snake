@@ -22,9 +22,10 @@ private:
     };
 
 public:
-    Snake(const Location& loc_in);
+    Snake();
     void MoveBy(const Location& delta_loc);
     void Grow();
+    void Reset();
     void Draw(Board& brd_in) const;
     Location GetLocationOfHead();
     bool IsPartOfSnake(Location& loc_in) const;
@@ -32,6 +33,7 @@ public:
 
 private:
     static constexpr int maxSnakeSize=100;
+    Location startLoc = { 17,15 };
     Segment segments[maxSnakeSize];
     static constexpr Color headColor = Colors::Yellow;
     static constexpr Color bodyColor1 = { 0,150,0 };

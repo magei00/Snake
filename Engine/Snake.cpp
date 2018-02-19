@@ -1,8 +1,8 @@
 #include "Snake.h"
 
-Snake::Snake(const Location & loc)
+Snake::Snake()
 {
-    segments[0].InitHead(loc);
+    segments[0].InitHead(startLoc);
 }
 
 void Snake::MoveBy(const Location & delta_loc)
@@ -35,6 +35,12 @@ void Snake::Grow()
         segments[nSegments].InitBody(bodyColor1, tailLocation);
     }
     nSegments++;
+}
+
+void Snake::Reset()
+{
+    nSegments = 1;
+    segments[0].InitHead(startLoc);
 }
 
 void Snake::Draw(Board & brd_in) const
