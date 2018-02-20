@@ -75,7 +75,7 @@ private:
     float time = 0.0001;
     Rock rocks[200];
     int nRocks = 0;
-    float rockSpawnInterval = 3.0f;
+    float rockSpawnInterval = 2.5f;
     float rockSpawnCounter = 0.0f;
     float snakeSpeedIncreaseInterval = 15.0f;
     Sound mainTheme;

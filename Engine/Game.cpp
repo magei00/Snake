@@ -61,19 +61,24 @@ void Game::UpdateModel()
 
     if (!gameOver)
     {
-        if (wnd.kbd.KeyIsPressed(VK_UP) && currentDir != Location {0, 1} )
+        bool up = wnd.kbd.KeyIsPressed(VK_UP) || wnd.kbd.KeyIsPressed('W');
+        bool down = wnd.kbd.KeyIsPressed(VK_DOWN) || wnd.kbd.KeyIsPressed('S');
+        bool left = wnd.kbd.KeyIsPressed(VK_LEFT) || wnd.kbd.KeyIsPressed('A');
+        bool right = wnd.kbd.KeyIsPressed(VK_RIGHT) || wnd.kbd.KeyIsPressed('D');
+
+        if (up && currentDir != Location {0, 1} )
         {
             delta_loc = { 0,-1 };
         }
-        else if (wnd.kbd.KeyIsPressed(VK_DOWN) && currentDir != Location{ 0, -1 })
+        else if (down && currentDir != Location{ 0, -1 })
         {
             delta_loc = { 0,1 };
         }
-        else if (wnd.kbd.KeyIsPressed(VK_LEFT) && currentDir != Location{ 1, 0 })
+        else if (left && currentDir != Location{ 1, 0 })
         {
             delta_loc = { -1,0 };
         }
-        else if (wnd.kbd.KeyIsPressed(VK_RIGHT) && currentDir != Location{ -1, 0 })
+        else if (right && currentDir != Location{ -1, 0 })
         {
             delta_loc = { 1,0 };
         }
@@ -91,9 +96,7 @@ void Game::UpdateModel()
                 {
                     snake.Grow();
                     snake.Grow();
-                    snake.Grow();
-                    snake.Grow();
-                    snake.Grow();
+                    
 
                     for (Rock& r : rocks) {
                         r.makeVulnerable(true);
@@ -105,6 +108,8 @@ void Game::UpdateModel()
                 else
                 {
                     bite.Play(rng);
+                    snake.Grow();
+                    snake.Grow();
                     snake.Grow();
                 }
                 
@@ -220,9 +225,15 @@ bool Game::checkCollisionWithRocks(Location loc)
 void Game::Reset()
 {
     snake.Reset();
+    time = 0.0f;
     gameOver = false;
     snakeSpeed = baseSnakeSpeed;
     snakeMoveCounter = 0.0f;
+
+    for (Rock& r : rocks) {
+        r.makeVulnerable(false);
+    }
+
     powerUpCounter = 0.0f;
     delta_loc = { 1,0 };
     //Rock rocks[100];
@@ -230,6 +241,16 @@ void Game::Reset()
     rockSpawnCounter = 0.0f;
     mainThemePlaying = false;
     gameOverSound.StopAll();
+
+    Location potLoc = brd.GetRandomLocation();
+
+    while (snake.IsPartOfSnake(potLoc) || checkCollisionWithRocks(potLoc)) //get random locations until a free location.
+    {
+        potLoc = brd.GetRandomLocation();
+    }
+
+    food.Respawn(potLoc, superFoodPercentage(rng) == 1);
+
 }
 
 void Game::ComposeFrame()
